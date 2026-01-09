@@ -145,3 +145,32 @@ document.getElementById("loginForm").addEventListener("submit", function(e) {
         }
     }
 });
+// Fix tab navigation
+function showTab(tabName) {
+    // Hide all content
+    document.querySelectorAll(".content").forEach(content => {
+        content.classList.remove("active");
+    });
+    // Remove active from all tabs
+    document.querySelectorAll(".tab").forEach(tab => {
+        tab.classList.remove("active");
+    });
+    // Show selected content and tab
+    document.getElementById(tabName).classList.add("active");
+    // Find and activate the clicked tab
+    const tabs = document.querySelectorAll(".tab");
+    tabs.forEach(tab => {
+        if (tab.textContent.includes(getTabIcon(tabName))) {
+            tab.classList.add("active");
+        }
+    });
+}
+function getTabIcon(tabName) {
+    const icons = {
+        "ssh": "🔧",
+        "vpn": "🔒",
+        "db": "🗄️",
+        "servers": "🖥️"
+    };
+    return icons[tabName] || "";
+}
