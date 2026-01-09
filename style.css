@@ -19,11 +19,13 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%), url("images/Snow1.gif");
     background-image:
         radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+    background-size: cover;
+    background-position: center;
     z-index: -1;
 }
 .winter-bg::before {
@@ -443,21 +445,6 @@ header h1 {
         text-align: center;
     }
 }
-/* Optimized Winter Background */
-.winter-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    background-image: url("images/Snow1.gif");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    z-index: -2;
-    opacity: 0.4;
-}
 .winter-bg::before {
     content: "";
     position: absolute;
@@ -554,4 +541,15 @@ header h1 {
     .main-character {
         width: 60px;
     }
+}
+.winter-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%), url("images/Snow1.gif");
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
 }
