@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Manager</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .tabs { display: flex; background: #333; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; transition: background 0.3s; }
+        .tab:hover { background: #555; }
+        .tab.active { background: #007cba; }
+        .content { background: #2a2a2a; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .hidden { display: none; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; background: #333; color: #fff; border: 1px solid #555; border-radius: 5px; }
+        button { padding: 12px 24px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #005a8b; }        .terminal { background: #000; color: #00ff00; font-family: monospace; padding: 15px; border-radius: 5px; height: 300px; overflow-y: auto; }
+        .status { padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .success { background: #2d5a2d; }
+        .error { background: #5a2d2d; }
+        .warning { background: #5a5a2d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖥️ Server Manager</h1>
+            <p>Управление сервером через веб-интерфейс</p>
+        </div>
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('ssh')">SSH Terminal</div>
+            <div class="tab" onclick="showTab('vpn')">VPN Control</div>
+            <div class="tab" onclick="showTab('database')">Database</div>
+            <div class="tab" onclick="showTab('servers')">Servers</div>
+        </div>
+        <div id="ssh" class="content">
+            <h3>🔧 SSH Terminal</h3>
+            <input type="text" id="sshHost" placeholder="Server IP" value="192.168.1.100">            <input type="text" id="sshUser" placeholder="Username" value="root">
+            <input type="password" id="sshPass" placeholder="Password">
+            <button onclick="connectSSH()">Connect</button>
+            <div id="sshStatus" class="status warning">Disconnected</div>
+            <div id="terminal" class="terminal">Welcome to Server Manager Terminal</div>
+            <input type="text" id="command" placeholder="Enter command..." onkeypress="handleCommand(event)">
+            <button onclick="executeCommand()">Execute</button>
+        </div>
+        <div id="vpn" class="content hidden">            <h3>🔒 VPN Control</h3>
+            <input type="text" id="vpnServer" placeholder="VPN Server" value="vpn.example.com">
+            <button onclick="toggleVPN()">Connect/Disconnect VPN</button>
+            <div id="vpnStatus" class="status error">VPN Disconnected</div>
+        </div>
+        <div id="database" class="content hidden">
+            <h3>🗄️ Database Manager</h3>
+            <input type="text" id="dbHost" placeholder="Database Host" value="localhost">
+            <input type="text" id="dbName" placeholder="Database Name" value="postgres">
+            <button onclick="connectDB()">Connect</button>
+            <div id="dbStatus" class="status error">Database Disconnected</div>
+            <textarea id="sqlQuery" rows="5" placeholder="Enter SQL query...">SELECT * FROM users LIMIT 10;</textarea>
+            <button onclick="executeQuery()">Execute Query</button>
+            <div id="queryResult" style="background: #333; padding: 15px; border-radius: 5px; margin-top: 10px;"></div>
+        </div>
+        <div id="servers" class="content hidden">
+            <h3>🖥️ Server List</h3>
+            <button onclick="addServer()">Add Server</button>
+            <div id="serverList">
+                <div style="background: #333; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <h4>Production Server</h4>
+                    <p>IP: 192.168.1.100 | Status: Online</p>
+                    <button onclick="connectToServer('192.168.1.100')">Connect</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let sshConnected = false;
+        let vpnConnected = false;
+        let dbConnected = false;
+        function showTab(tabName) {
+            document.querySelectorAll('.content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.remove('hidden');
+            event.target.classList.add('active');
+        }
+        function connectSSH() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            sshConnected = true;
+            document.getElementById('sshStatus').innerHTML = `Connected to ${user}@${host}`;
+            document.getElementById('sshStatus').className = 'status success';
+            document.getElementById('terminal').innerHTML += `\nConnected to ${host} as ${user}\n$ `;
+        }
+        function executeCommand() {
+            const command = document.getElementById('command').value;
+            if (!sshConnected) return;
+            document.getElementById('terminal').innerHTML += `${command}\nCommand executed: ${command}\n$ `;
+            document.getElementById('command').value = '';
+        }
+        function handleCommand(event) {
+            if (event.key === 'Enter') executeCommand();
+        }
+        function toggleVPN() {
+            vpnConnected = !vpnConnected;
+            const status = vpnConnected ? 'VPN Connected' : 'VPN Disconnected';
+            const className = vpnConnected ? 'status success' : 'status error';
+            document.getElementById('vpnStatus').innerHTML = status;
+            document.getElementById('vpnStatus').className = className;
+        }
+        function connectDB() {
+            const host = document.getElementById('dbHost').value;
+            const dbName = document.getElementById('dbName').value;
+            dbConnected = true;
+            document.getElementById('dbStatus').innerHTML = `Connected to ${host}/${dbName}`;
+            document.getElementById('dbStatus').className = 'status success';
+        }
+        function executeQuery() {
+            const query = document.getElementById('sqlQuery').value;
+            if (!dbConnected) return;
+            document.getElementById('queryResult').innerHTML = `Query executed: ${query}\nResults: Sample data returned`;
+        }
+        function addServer() {
+            const name = prompt('Server name:');
+            const ip = prompt('Server IP:');
+            if (name && ip) {
+                document.getElementById('serverList').innerHTML += `
+                    <div style="background: #333; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                        <h4>${name}</h4>
+                        <p>IP: ${ip} | Status: Unknown</p>
+                        <button onclick="connectToServer('${ip}')">Connect</button>
+                    </div>`;
+            }
+        }
+        function connectToServer(ip) {
+            document.getElementById('sshHost').value = ip;
+            showTab('ssh');
+        }
+    </script>
+</body>
+</html>
