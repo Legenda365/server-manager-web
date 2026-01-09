@@ -3,138 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Manager</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .tabs { display: flex; background: #333; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; transition: background 0.3s; }
-        .tab:hover { background: #555; }
-        .tab.active { background: #007cba; }
-        .content { background: #2a2a2a; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
-        .hidden { display: none; }
-        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; background: #333; color: #fff; border: 1px solid #555; border-radius: 5px; }
-        button { padding: 12px 24px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
-        button:hover { background: #005a8b; }        .terminal { background: #000; color: #00ff00; font-family: monospace; padding: 15px; border-radius: 5px; height: 300px; overflow-y: auto; }
-        .status { padding: 10px; border-radius: 5px; margin: 10px 0; }
-        .success { background: #2d5a2d; }
-        .error { background: #5a2d2d; }
-        .warning { background: #5a5a2d; }
-    </style>
+    <title>Server Manager Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🖥️ Server Manager</h1>
-            <p>Управление сервером через веб-интерфейс</p>
+    <div class="winter-bg"></div>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <h1>🖥️ Server Manager Pro</h1>
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Войти</button>
+                <p><a href="#" onclick="toggleAuthMode()">Создать аккаунт</a></p>
+            </form>
         </div>
-        <div class="tabs">
-            <div class="tab active" onclick="showTab('ssh')">SSH Terminal</div>
-            <div class="tab" onclick="showTab('vpn')">VPN Control</div>
-            <div class="tab" onclick="showTab('database')">Database</div>
-            <div class="tab" onclick="showTab('servers')">Servers</div>
-        </div>
-        <div id="ssh" class="content">
-            <h3>🔧 SSH Terminal</h3>
-            <input type="text" id="sshHost" placeholder="Server IP" value="192.168.1.100">            <input type="text" id="sshUser" placeholder="Username" value="root">
-            <input type="password" id="sshPass" placeholder="Password">
-            <button onclick="connectSSH()">Connect</button>
-            <div id="sshStatus" class="status warning">Disconnected</div>
-            <div id="terminal" class="terminal">Welcome to Server Manager Terminal</div>
-            <input type="text" id="command" placeholder="Enter command..." onkeypress="handleCommand(event)">
-            <button onclick="executeCommand()">Execute</button>
-        </div>
-        <div id="vpn" class="content hidden">            <h3>🔒 VPN Control</h3>
-            <input type="text" id="vpnServer" placeholder="VPN Server" value="vpn.example.com">
-            <button onclick="toggleVPN()">Connect/Disconnect VPN</button>
-            <div id="vpnStatus" class="status error">VPN Disconnected</div>
-        </div>
-        <div id="database" class="content hidden">
-            <h3>🗄️ Database Manager</h3>
-            <input type="text" id="dbHost" placeholder="Database Host" value="localhost">
-            <input type="text" id="dbName" placeholder="Database Name" value="postgres">
-            <button onclick="connectDB()">Connect</button>
-            <div id="dbStatus" class="status error">Database Disconnected</div>
-            <textarea id="sqlQuery" rows="5" placeholder="Enter SQL query...">SELECT * FROM users LIMIT 10;</textarea>
-            <button onclick="executeQuery()">Execute Query</button>
-            <div id="queryResult" style="background: #333; padding: 15px; border-radius: 5px; margin-top: 10px;"></div>
-        </div>
-        <div id="servers" class="content hidden">
-            <h3>🖥️ Server List</h3>
-            <button onclick="addServer()">Add Server</button>
-            <div id="serverList">
-                <div style="background: #333; padding: 15px; border-radius: 5px; margin: 10px 0;">
-                    <h4>Production Server</h4>
-                    <p>IP: 192.168.1.100 | Status: Online</p>
-                    <button onclick="connectToServer('192.168.1.100')">Connect</button>
+        <img src="https://i.imgur.com/anime1.gif" class="anime-art bottom-right" alt="Anime">
+    </div>
+    <!-- Main App -->
+    <div id="mainApp" class="main-app hidden">
+        <header>
+            <h1>🖥️ Server Manager Pro</h1>
+            <div class="user-info">
+                <span id="userEmail"></span>
+                <button onclick="logout()">Выйти</button>
+            </div>
+        </header>
+        <nav class="tabs">
+            <button class="tab active" onclick="showTab(\"ssh\")">🔧 SSH Terminal</button>
+            <button class="tab" onclick="showTab(\"vpn\")">🔒 VPN Control</button>
+            <button class="tab" onclick="showTab(\"db\")">🗄️ Database</button>
+            <button class="tab" onclick="showTab(\"servers\")">🖥️ Servers</button>
+        </nav>
+
+        <!-- SSH Terminal Tab -->
+        <div id="ssh" class="content active">
+            <div class="content-wrapper">
+                <div class="terminal-section">
+                    <h3>🔧 SSH Terminal</h3>
+                    <div class="connection-form">
+                        <input type="text" id="sshHost" placeholder="Server IP" value="">
+                        <input type="text" id="sshUser" placeholder="Username" value="">
+                        <input type="password" id="sshPass" placeholder="Password" value="">
+                        <button onclick="connectSSH()">Connect</button>
+                    </div>
+                    <div class="terminal" id="terminal">
+                        <div class="terminal-header">Terminal - <span id="sshStatus">Disconnected</span></div>                        <div class="terminal-body" id="terminalBody">
+                            <div class="terminal-line">Welcome to Server Manager Terminal</div>
+                        </div>
+                        <div class="terminal-input">
+                            <span class="prompt">$</span>
+                            <input type="text" id="commandInput" placeholder="Enter command..." onkeypress="handleCommand(event)">
+                        </div>
+                    </div>
                 </div>
+                <img src="https://i.imgur.com/anime2.gif" class="anime-art terminal-art" alt="Anime">
+            </div>
+        </div>
+        <!-- VPN Control Tab -->
+        <div id="vpn" class="content">
+            <div class="content-wrapper">
+                <div class="vpn-section">
+                    <h3>🔒 VPN Control</h3>
+                    <div class="vpn-list">
+                        <div class="vpn-item">
+                            <div class="vpn-info">
+                                <h4>🇺🇸 USA East</h4>
+                                <p>IP: 192.168.1.100</p>
+                            </div>
+                            <div class="vpn-speed">
+                                <span class="speed">85 Mbps</span>
+                                <div class="speed-bar"><div class="speed-fill" style="width: 85%"></div></div>                            </div>
+                            <button class="vpn-connect" onclick="connectVPN(this, 'USA')">Connect</button>
+                        </div>
+                        <div class="vpn-item">
+                            <div class="vpn-info">
+                                <h4>🇯🇵 Japan Tokyo</h4>
+                                <p>IP: 192.168.1.101</p>
+                            </div>
+                            <div class="vpn-speed">
+                                <span class="speed">92 Mbps</span>
+                                <div class="speed-bar"><div class="speed-fill" style="width: 92%"></div></div>                            </div>
+                            <button class="vpn-connect" onclick="connectVPN(this, 'USA')">Connect</button>
+                        </div>
+                        <div class="vpn-item">
+                            <div class="vpn-info">
+                                <h4>🇩🇪 Germany Berlin</h4>
+                                <p>IP: 192.168.1.102</p>
+                            </div>
+                            <div class="vpn-speed">
+                                <span class="speed">78 Mbps</span>
+                                <div class="speed-bar"><div class="speed-fill" style="width: 78%"></div></div>                            </div>
+                            <button class="vpn-connect" onclick="connectVPN(this, 'USA')">Connect</button>
+                        </div>
+                    </div>
+                </div>
+                <img src="https://i.imgur.com/anime3.gif" class="anime-art vpn-art" alt="Anime">
+            </div>
+        </div>
+
+        <!-- Database Tab -->
+        <div id="db" class="content">
+            <div class="content-wrapper">
+                <div class="db-section">
+                    <h3>🗄️ Database Manager</h3>
+                    <div class="db-form">
+                        <input type="text" id="dbHost" placeholder="Database Host" value="">
+                        <input type="text" id="dbName" placeholder="Database Name" value="">
+                        <input type="text" id="dbUser" placeholder="Username" value="">
+                        <input type="password" id="dbPass" placeholder="Password" value="">
+                        <button onclick="connectDB()">Connect</button>
+                    </div>
+                    <div class="query-section">
+                        <textarea id="sqlQuery" placeholder="SELECT * FROM users LIMIT 10;" rows="4"></textarea>
+                        <button onclick="executeQuery()">Execute Query</button>
+                    </div>
+                    <div class="query-result" id="queryResult">
+                        <div class="result-header">Query Results</div>
+                        <div class="result-body">Database Disconnected</div>
+                    </div>
+                </div>
+                <img src="https://i.imgur.com/anime4.gif" class="anime-art db-art" alt="Anime">
+            </div>
+        </div>
+        <!-- Servers Tab -->
+        <div id="servers" class="content">
+            <div class="content-wrapper">
+                <div class="servers-section">
+                    <h3>🖥️ Server List</h3>
+                    <button class="add-server-btn" onclick="addServer()">+ Add Server</button>
+                    <div class="server-list">
+                        <div class="server-item">
+                            <div class="server-info">
+                                <h4>Production Server</h4>
+                                <p>IP: 192.168.1.100</p>
+                                <span class="status online">Online</span>
+                            </div>
+                            <button class="server-connect">Connect</button>
+                        </div>
+                    </div>
+                </div>
+                <img src="https://i.imgur.com/anime5.gif" class="anime-art servers-art" alt="Anime">
             </div>
         </div>
     </div>
-    <script>
-        let sshConnected = false;
-        let vpnConnected = false;
-        let dbConnected = false;
-        function showTab(tabName) {
-            document.querySelectorAll('.content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabName).classList.remove('hidden');
-            event.target.classList.add('active');
-        }
-        function connectSSH() {
-            const host = document.getElementById('sshHost').value;
-            const user = document.getElementById('sshUser').value;
-            sshConnected = true;
-            document.getElementById('sshStatus').innerHTML = `Connected to ${user}@${host}`;
-            document.getElementById('sshStatus').className = 'status success';
-            document.getElementById('terminal').innerHTML += `\nConnected to ${host} as ${user}\n$ `;
-        }
-        function executeCommand() {
-            const command = document.getElementById('command').value;
-            if (!sshConnected) return;
-            document.getElementById('terminal').innerHTML += `${command}\nCommand executed: ${command}\n$ `;
-            document.getElementById('command').value = '';
-        }
-        function handleCommand(event) {
-            if (event.key === 'Enter') executeCommand();
-        }
-        function toggleVPN() {
-            vpnConnected = !vpnConnected;
-            const status = vpnConnected ? 'VPN Connected' : 'VPN Disconnected';
-            const className = vpnConnected ? 'status success' : 'status error';
-            document.getElementById('vpnStatus').innerHTML = status;
-            document.getElementById('vpnStatus').className = className;
-        }
-        function connectDB() {
-            const host = document.getElementById('dbHost').value;
-            const dbName = document.getElementById('dbName').value;
-            dbConnected = true;
-            document.getElementById('dbStatus').innerHTML = `Connected to ${host}/${dbName}`;
-            document.getElementById('dbStatus').className = 'status success';
-        }
-        function executeQuery() {
-            const query = document.getElementById('sqlQuery').value;
-            if (!dbConnected) return;
-            document.getElementById('queryResult').innerHTML = `Query executed: ${query}\nResults: Sample data returned`;
-        }
-        function addServer() {
-            const name = prompt('Server name:');
-            const ip = prompt('Server IP:');
-            if (name && ip) {
-                document.getElementById('serverList').innerHTML += `
-                    <div style="background: #333; padding: 15px; border-radius: 5px; margin: 10px 0;">
-                        <h4>${name}</h4>
-                        <p>IP: ${ip} | Status: Unknown</p>
-                        <button onclick="connectToServer('${ip}')">Connect</button>
-                    </div>`;
-            }
-        }
-        function connectToServer(ip) {
-            document.getElementById('sshHost').value = ip;
-            showTab('ssh');
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
