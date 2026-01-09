@@ -174,3 +174,19 @@ function getTabIcon(tabName) {
     };
     return icons[tabName] || "";
 }
+// Anime Arts Animation
+document.addEventListener('DOMContentLoaded', function() {    const animeArts = document.querySelectorAll('.anime-art');
+    animeArts.forEach((art, index) => {
+        art.style.opacity = '0';
+        art.style.transform = 'scale(0.8) translateY(20px)';
+        setTimeout(() => {
+            art.style.transition = 'all 0.8s ease';
+            art.style.opacity = '0.8';
+            art.style.transform = 'scale(1) translateY(0)';
+        }, index * 200);
+    });
+});
+// Performance optimization for mobile
+if (window.innerWidth <= 768) {
+    document.querySelector('.winter-bg').style.backgroundImage = 'none';
+}
